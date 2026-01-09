@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Guante Control - Interfaz</title>
+<style>
+  :root {
+    /* Paleta Beige & Blanco */
+    --bg: #F9F7F2;          
+    --card-bg: #FFFFFF;     
+    --text-main: #4A4036;   
+    --text-light: #8C857B;  
+    --accent: #D4B483;      
+    
+    /* Botones */
+    --btn-primary: #6D5E50; 
+    --btn-text: #FFFFFF;
+    --btn-action: #8DA399;  
+    --btn-danger: #D68C8C;  
+    --btn-success: #7FB069; 
+
+    /* Status */
+    --dot-off: #BBB;
+    --dot-on: #7FB069;
+    
+    /* Ayuda */
+    --help-bg: #FFF8E1;
+    --help-border: #FFE082;
+    --help-text: #5D4037;
+  }
+
+  * { box-sizing: border-box; }
+  body { 
+    margin: 0; 
+    background: var(--bg); 
+    color: var(--text-main); 
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* --- Header --- */
+  header { 
+    background: var(--card-bg);
+    padding: 15px 20px; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 80px;
+  }
+
+  .left-area { display: flex; align-items: center; z-index: 2; }
+  .center-area { position: absolute; left: 50%; transform: translateX(-50%); text-align: center; width: 100%; pointer-events: none; }
+  .right-area { display: flex; gap: 8px; align-items: center; z-index: 2; }
+
+  h1 { font-size: 22px; margin: 0; font-weight: 800; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+
+  .status-badge {
+    display: flex; align-items: center; gap: 8px; background: #F4F4F0;
+    padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    color: var(--text-light); border: 1px solid #EBE5DB;
+  }
+  
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--dot-off); display: inline-block; box-shadow: inset 0 1px 2px rgba(0,0,0,0.2); transition: background 0.3s; }
+  .status-dot.on { background: var(--dot-on); box-shadow: 0 0 6px var(--dot-on); }
+
+  @media (max-width: 600px) {
+    input#namePrefix { display: none; }
+    h1 { font-size: 16px; } 
+    .status-badge span { display: none; } 
+    .status-badge { gap: 0; padding: 8px; border-radius: 50%; } 
+  }
+  
+  input#namePrefix {
+    border: 1px solid #E0D8CC; background: #FFF; padding: 10px; border-radius: 8px;
+    color: var(--text-main); font-weight: 600; font-size: 14px; width: 100px; outline: none; text-align: center;
+  }
+  
+  /* --- Botones --- */
+  button { 
+    background: var(--btn-primary); color: var(--btn-text); border: none; padding: 10px 16px; 
+    border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  button:hover { filter: brightness(105%); transform: translateY(-1px); }
+  button:active { transform: translateY(1px); box-shadow: none; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; filter: grayscale(100%); }
+
+  button.connect { background: var(--btn-action); }
+  button.disconnect { background: #FFF; color: var(--btn-danger); border: 2px solid var(--btn-danger); }
+  button.secondary { background: #FFF; color: var(--text-main); border: 2px solid #E0D8CC; }
+  button.warn { background: #FFF; color: var(--btn-danger); border: 2px solid var(--btn-danger); }
+  button.ghost { background: transparent; color: var(--text-light); border: 1px dashed var(--text-light); padding: 6px 12px; font-size: 12px;}
+
+  /* --- Tabs --- */
+  .tabs-container { display: flex; justify-content: center; margin: 20px 0; padding: 0 16px; }
+  .tabs { background: #EBE5DB; padding: 4px; border-radius: 12px; display: flex; gap: 4px; }
+  .tab { background: transparent; color: var(--text-light); padding: 10px 24px; border-radius: 10px; cursor: pointer; border: none; font-size: 15px; box-shadow: none; }
+  .tab.active { background: #FFF; color: var(--text-main); box-shadow: 0 2px 6px rgba(0,0,0,0.05); font-weight: 700; }
+
+  /* --- Layout --- */
+  main { padding: 0 16px 40px 16px; max-width: 900px; margin: 0 auto; display: grid; gap: 20px; }
+
+  .card { background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 4px 16px rgba(74, 64, 54, 0.03); border: 1px solid #F0EBE0; }
+  .title { font-size: 17px; font-weight: 700; margin: 0 0 12px 0; color: var(--text-main); display: flex; justify-content: space-between; align-items: center; }
+  .small { font-size: 13px; color: var(--text-light); margin-top: 4px;}
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+
+  /* --- Gauges --- */
+  label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-light); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .gauge-container { background: #F0F0F0; height: 20px; border-radius: 10px; overflow: hidden; position: relative; }
+  .gauge-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #8DA399, #7FB069); transition: width 0.1s ease-out; border-radius: 10px; }
+  .val-big { font-size: 32px; font-weight: 800; color: var(--text-main); line-height: 1.1; }
+  .unit { font-size: 14px; font-weight: 500; color: var(--text-light); margin-left: 2px; }
+
+  /* --- NUEVO: Estilos para Calibración Centrada --- */
+  .calib-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .calib-value-big {
+    font-size: 56px; /* Muy grande */
+    font-weight: 800;
+    color: var(--btn-primary);
+    line-height: 1;
+    margin: 10px 0;
+  }
+  .calib-saved-box {
+    background: #F4F4F0;
+    border: 1px solid #E0D8CC;
+    border-radius: 12px;
+    padding: 12px 20px;
+    width: 100%;
+    margin-top: 10px;
+  }
+  .calib-saved-vals {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 15px;
+  }
+
+  /* --- Logs --- */
+  .log { height: 100px; overflow: auto; background: #F8F8F8; padding: 10px; border-radius: 8px; font-size: 12px; color: #666; font-family: monospace; border: 1px solid #EEE; }
+
+  /* --- Calibración Botones --- */
+  .calib-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .btn-full { grid-column: 1 / -1; }
+
+  .finish-card { border: 2px solid var(--btn-success); background: #F4FAF0; text-align: center; }
+  #btnFinish { background: var(--btn-success); color: #FFF; font-size: 18px; padding: 16px; width: 100%; margin-top: 10px; box-shadow: 0 4px 10px rgba(127, 176, 105, 0.25); }
+
+  /* --- Desplegable de Ayuda --- */
+  .help-card { background: var(--help-bg); border: 1px solid var(--help-border); cursor: pointer; transition: all 0.2s; }
+  .help-card:hover { transform: translateY(-2px); }
+  .help-content { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); display: none; }
+  .help-content.show { display: block; animation: fadeIn 0.3s; }
+  .help-list li { margin-bottom: 8px; font-size: 14px; color: var(--help-text); }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .hidden { display: none !important; }
+  .mono { font-family: monospace; font-weight: 600; color: #555; }
+  input[type="number"], select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #DDD; background: #FFF; color: var(--text-main); font-size: 15px; }
+
+  /* Radio Pills */
+  .pill { padding: 6px 14px; border-radius: 99px; border: 1px solid #DDD; background: #FFF; cursor: pointer; font-size: 13px; color: var(--text-light); }
+  .pill input { display: none; }
+  .pill:has(input:checked) { background: var(--btn-primary); color: #FFF; border-color: var(--btn-primary); }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="left-area">
+    <div class="status-badge">
+      <span id="dot" class="status-dot"></span>
+      <span id="statusText">Desconectado</span>
+    </div>
+  </div>
+  <div class="center-area">
+    <h1>Guante Control</h1>
+  </div>
+  <div class="right-area">
+    <input id="namePrefix" value="Guante" placeholder="Nombre" />
+    <button id="btnConnect" class="connect">Conectar</button>
+    <button id="btnDisconnect" class="disconnect" disabled>Salir</button>
+  </div>
+</header>
+
+<div class="tabs-container">
+  <div class="tabs">
+    <button id="tabLecturas" class="tab active">Lecturas</button>
+    <button id="tabCalib" class="tab">Calibración</button>
+  </div>
+</div>
+
+<main>
+  <section id="viewLecturas">
+    
+    <div class="card">
+      <div class="title">✋ Flexión (Mano)</div>
+      <div class="grid">
+        <div>
+          <label>Nivel de Cierre</label>
+          <div class="gauge-container"><div id="barFlex" class="gauge-bar"></div></div>
+          <div class="small" style="margin-top: 8px;">Porcentaje: <b><span id="valPctFlex">0</span>%</b></div>
+        </div>
+        <div>
+          <label>Ángulo Real</label>
+          <div class="val-big"><span id="valDegFlex">0.00</span><span class="unit">°</span></div>
+          <div class="small">Sensor I2C</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title">🔄 Giro (Muñeca)</div>
+      <div class="grid">
+        <div>
+          <label>Ángulo de Giro</label>
+          <div class="val-big"><span id="valWrist">0.00</span><span class="unit">°</span></div>
+          <div class="small">Posición Relativa</div>
+        </div>
+        <div>
+          <label>Estado Normalizado</label>
+          <div class="val-big"><span id="valWristPct">50</span><span class="unit">%</span></div>
+          <div class="small">0=Izq · 50=Recto · 100=Der</div>
+        </div>
+      </div>
+      <div style="margin-top: 16px; text-align: right;">
+        <button id="goCalib" class="ghost">Ir a Calibración →</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title">Registro de Eventos</div>
+      <div id="log" class="log"></div>
+    </div>
+  </section>
+
+  <section id="viewCalib" class="hidden">
+    
+    <div class="card help-card" id="toggleHelp">
+      <div class="title" style="margin:0; color:var(--help-text);">
+        <span>💡 Guía Rápida: Cómo Calibrar</span>
+        <span id="helpArrow">▼</span>
+      </div>
+      <div class="help-content" id="helpContent">
+        <ul class="help-list" style="padding-left:20px; margin:0;">
+          <li><b>🛑 IMPORTANTE:</b> Siempre se debe tomar un valor de calibración cuando la lectura sea <b>estable o tiene poca variación</b></li>
+          <li style="margin-top:8px"><b>1. Mano (Velocidad):</b>
+            <br>✋ Abre la mano relajada ➡️ Pulsa "Mano Abierta". <b>Piensa que esta postura debe ser natural.</b>
+            <br>✊ Cierra el puño fuerte ➡️ Pulsa "Mano Cerrada".
+          </li>
+          <li style="margin-top:8px"><b>2. Muñeca (Giro):</b>
+            <br>👇 Pon la mano en una posición <b>NATURAL</b>, piensa que sera la referencia para ir recto. ➡️ Pulsa "Guardar CENTRO".
+            <br>👈 Gira la mano lo<b> máximo a la izquierda</b> que puedas, esta posición será el máximo giro a la izquierda posible. ➡️ Pulsa "Max. IZQ".
+            <br>👉 Gira la mano lo<b> máximo a la derecha</b> que puedas, esta posición será el máximo giro a la derecha posible.  Pulsa "Max. IZQ".
+          </li>
+          <li style="margin-top:8px"><b>3. Finalizar:</b>
+            <br>✅ Cuando acabes, pulsa el botón VERDE abajo del todo.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title"> 🚀 Ajustar aceleración (Mano)</div>
+      
+      <div class="calib-display">
+        <label>Lectura Actual</label>
+        <div class="calib-value-big"><span id="valDegFlex2">0.00</span>°</div>
+        
+        <div class="calib-saved-box">
+          <label style="margin-bottom:4px;">Valores Guardados</label>
+          <div class="calib-saved-vals">🖐️ Abierta: <span id="minVal">—</span>° | ✊ Cerrada: <span id="maxVal">—</span>°</div>
+        </div>
+      </div>
+      
+      <div class="calib-actions">
+        <button id="btnOpen" class="secondary">1) Mano Abierta</button>
+        <button id="btnClosed" class="secondary">2) Mano Cerrada</button>
+        <button id="btnReset" class="warn btn-full">Borrar calibración mano</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title">🔄️ Ajustar el volante (Inclinación de la muñeca)</div>
+      
+      <div class="calib-display">
+        <label>Lectura Actual</label>
+        <div class="calib-value-big"><span id="valWrist2">0.00</span>°</div>
+        
+        <div class="calib-saved-box">
+          <label style="margin-bottom:4px;">Valores Guardados</label>
+          <div class="calib-saved-vals"> Izquierda: <span id="rotMin2">—</span>° <b>|</b> Centro: <span id="rotZero2">—</span>°<b> | </b>Derecha: <span id="rotMax2">—</span>°
+            
+           
+            
+          </div>
+        </div>
+      </div>
+
+      <div class="calib-actions">
+        <button id="btnRotReset" class="warn btn-full">1º Reiniciar (Borrar Todo)</button>
+        <button id="btnRotZero" class="secondary btn-full">2º Guardar CENTRO (Neutro)</button>
+        <button id="btnRotCCW" class="secondary">3º Max. IZQ</button>
+        <button id="btnRotCW" class="secondary">4º Max. DER</button>
+      </div>
+    </div>
+
+    <div class="card finish-card">
+      <div class="title" style="justify-content:center; color: var(--btn-success);">🚀 Paso Final</div>
+      <p>Una vez calibrado todo, pulsa este botón. <br>La web se desconectará y la silla se activará.</p>
+      <button id="btnFinish">✅ TERMINAR Y CONDUCIR</button>
+    </div>
+
+    <div class="card">
+      <div class="title">Ajustes Avanzados <button id="openWizardFlex" class="ghost">Asistente</button></div>
+      <div class="grid">
+        <div>
+          <label>Zona Muerta Aceleración (%)</label>
+          <input id="cfgDeadFlex" type="number" min="0" max="20" value="3" />
+        </div>
+        <div>
+          <label>Zona Muerta Giro (%)</label>
+          <input id="cfgDeadWrist" type="number" min="0" max="20" value="5" />
+        </div>
+      </div>
+      <div class="calib-actions" style="margin-top:15px">
+        <button id="btnSave" class="secondary">Guardar en Memoria</button>
+        <button id="btnDefaults" class="warn">Restaurar Fábrica</button>
+      </div>
+      <div class="small" id="saveHint" style="text-align:center; margin-top:10px;">—</div>
+    </div>
+
+    <section id="wizardFlexCard" style="display:none; background:#F7F7F7; padding:15px; border-radius:10px; margin-top:10px;">
+        <p>Aquí irían las preguntas del asistente...</p>
+        <button id="wizFlexCancel" class="secondary">Cerrar</button>
+    </section>
+
+  </section>
+</main>
+
+<script>
+// ===== LÓGICA DE PROGRAMACIÓN =====
+const el = id => document.getElementById(id);
+const log = s => { const d=el('log'); d.textContent = `> ${s}\n` + d.textContent; }
+function clamp(v,min,max){ return v<min?min:(v>max?max:v); }
+
+// Tabs
+function showLecturas(){ el('tabLecturas').classList.add('active'); el('tabCalib').classList.remove('active'); el('viewLecturas').classList.remove('hidden'); el('viewCalib').classList.add('hidden'); }
+function showCalib(){ el('tabCalib').classList.add('active'); el('tabLecturas').classList.remove('active'); el('viewCalib').classList.remove('hidden'); el('viewLecturas').classList.add('hidden'); }
+el('tabLecturas').addEventListener('click', showLecturas);
+el('tabCalib').addEventListener('click', showCalib);
+el('goCalib').addEventListener('click', showCalib);
+
+// Toggle Ayuda
+el('toggleHelp').addEventListener('click', () => {
+  const content = el('helpContent');
+  const arrow = el('helpArrow');
+  if(content.classList.contains('show')){
+    content.classList.remove('show');
+    arrow.textContent = '▼';
+  } else {
+    content.classList.add('show');
+    arrow.textContent = '▲';
+  }
+});
+
+// Asistentes
+el('openWizardFlex').addEventListener('click', ()=> { el('wizardFlexCard').style.display='block'; });
+el('wizFlexCancel').addEventListener('click', ()=> { el('wizardFlexCard').style.display='none'; });
+
+// UUIDs
+const SVC_UUID   = '6e400001-b5a3-f393-e0a9-e50e24dcca9f';
+const RAW_UUID   = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+const NORM_UUID  = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+const ANG_UUID   = '6e400004-b5a3-f393-e0a9-e50e24dcca9e';
+const CMD_UUID   = '6e400005-b5a3-f393-e0a9-e50e24dcca9e';
+const CAL_UUID   = '6e400006-b5a3-f393-e0a9-e50e24dcca9e';
+const ROT_UUID   = '6e400007-b5a3-f393-e0a9-e50e24dcca9e';
+const ROTN_UUID  = '6e400008-b5a3-f393-e0a9-e50e24dcca9e';
+const RCAL_UUID  = '6e400009-b5a3-f393-e0a9-e50e24dcca9e';
+const CTRL_UUID  = '6e40000a-b5a3-f393-e0a9-e50e24dcca9e';
+
+// Estado
+let device, server, service;
+let chRaw, chNorm, chAng, chCmd, chCal;
+let chRot, chRotN, chRcal;
+
+const setConnected = (on, name='—')=>{
+  el('dot').classList.toggle('on', on);
+  
+  const statusText = el('statusText');
+  if(statusText) {
+    statusText.textContent = on ? 'Conectado' : 'Desconectado';
+    statusText.style.color = on ? 'var(--btn-success)' : 'var(--text-light)';
+  }
+
+  el('btnConnect').disabled = on; el('btnConnect').textContent = on ? 'Conectado' : 'Conectar';
+  el('btnDisconnect').disabled = !on;
+  const btns = ['btnOpen','btnClosed','btnReset','btnRotZero','btnRotCCW','btnRotCW','btnRotReset','btnFinish'];
+  btns.forEach(id=> { const b=el(id); if(b) b.disabled=!on; });
+};
+
+// Conexión
+async function connect(){
+  try{
+    const prefix = el('namePrefix').value.trim() || 'Guante';
+    log('Buscando dispositivo...');
+    device = await navigator.bluetooth.requestDevice({ filters:[{ namePrefix: prefix }], optionalServices:[SVC_UUID] });
+    device.addEventListener('gattserverdisconnected', onDisconnect);
+    server = await device.gatt.connect();
+    service = await server.getPrimaryService(SVC_UUID);
+
+    chRaw  = await service.getCharacteristic(RAW_UUID);
+    chNorm = await service.getCharacteristic(NORM_UUID);
+    chAng  = await service.getCharacteristic(ANG_UUID);
+    chCmd  = await service.getCharacteristic(CMD_UUID);
+    chCal  = await service.getCharacteristic(CAL_UUID);
+    chRot  = await service.getCharacteristic(ROT_UUID);
+    chRotN = await service.getCharacteristic(ROTN_UUID);
+    chRcal = await service.getCharacteristic(RCAL_UUID);
+    try { chRaw = await service.getCharacteristic(RAW_UUID); } catch(e){}
+
+    // Suscripciones
+    await chNorm.startNotifications();
+    chNorm.addEventListener('characteristicvaluechanged', e=>{
+      const pct = e.target.value.getUint8(0);
+      el('valPctFlex').textContent = pct;
+      el('barFlex').style.width = `${clamp(pct,0,100)}%`;
+    });
+    
+    await chAng.startNotifications();
+    chAng.addEventListener('characteristicvaluechanged', e=>{
+      const v = e.target.value.getFloat32(0, true);
+      el('valDegFlex').textContent = v.toFixed(2);
+      el('valDegFlex2').textContent = v.toFixed(2);
+    });
+
+    await chCal.startNotifications();
+    chCal.addEventListener('characteristicvaluechanged', e => {
+      const min = e.target.value.getFloat32(0, true);
+      const max = e.target.value.getFloat32(4, true);
+      el('minVal').textContent = min.toFixed(1);
+      el('maxVal').textContent = max.toFixed(1);
+    });
+    const dvCal = await chCal.readValue();
+    el('minVal').textContent = dvCal.getFloat32(0, true).toFixed(1);
+    el('maxVal').textContent = dvCal.getFloat32(4, true).toFixed(1);
+
+    await chRot.startNotifications();
+    chRot.addEventListener('characteristicvaluechanged', e=>{
+      const deg = e.target.value.getFloat32(0, true);
+      el('valWrist').textContent = deg.toFixed(2);
+      el('valWrist2').textContent = deg.toFixed(2);
+    });
+
+    await chRotN.startNotifications();
+    chRotN.addEventListener('characteristicvaluechanged', e=>{
+      const pct = e.target.value.getUint8(0);
+      el('valWristPct').textContent = pct;
+    });
+
+    await chRcal.startNotifications();
+    chRcal.addEventListener('characteristicvaluechanged', e => {
+      const z = (e.target.value.getInt16(0,false))/10;
+      const mn = (e.target.value.getInt16(2,false))/10;
+      const mx = (e.target.value.getInt16(4,false))/10;
+      el('rotZero2').textContent = z.toFixed(1);
+      el('rotMin2').textContent  = mn.toFixed(1);
+      el('rotMax2').textContent  = mx.toFixed(1);
+    });
+    const dvR = await chRcal.readValue();
+    el('rotZero2').textContent = (dvR.getInt16(0,false)/10).toFixed(1);
+    el('rotMin2').textContent  = (dvR.getInt16(2,false)/10).toFixed(1);
+    el('rotMax2').textContent  = (dvR.getInt16(4,false)/10).toFixed(1);
+
+    setConnected(true);
+    log('¡Conectado!');
+  }catch(err){
+    log('Error: '+err.message);
+    setConnected(false);
+  }
+}
+
+function onDisconnect(){ setConnected(false); log('Desconectado'); }
+async function disconnect(){ try{ device && device.gatt.disconnect(); }catch(_){} }
+
+async function sendCmd(txt){
+  if(!chCmd) return;
+  const enc = new TextEncoder();
+  await chCmd.writeValue(enc.encode(txt));
+  log('CMD: '+txt);
+}
+
+// Eventos Botones
+el('btnConnect').addEventListener('click', connect);
+el('btnDisconnect').addEventListener('click', disconnect);
+el('btnOpen').addEventListener('click', ()=>sendCmd('SET_OPEN'));
+el('btnClosed').addEventListener('click', ()=>sendCmd('SET_CLOSED'));
+el('btnReset').addEventListener('click', ()=>sendCmd('RESET_CAL'));
+el('btnRotZero').addEventListener('click', ()=>sendCmd('ROT_ZERO'));
+el('btnRotCCW').addEventListener('click', ()=>sendCmd('ROT_MIN'));
+el('btnRotCW').addEventListener('click', ()=>sendCmd('ROT_MAX'));
+el('btnRotReset').addEventListener('click', ()=>sendCmd('ROT_RESET'));
+
+el('btnFinish').addEventListener('click', async () => {
+  if(!confirm("¿Activar silla y desconectar?")) return;
+  await sendCmd('CAL_DONE');
+  log('Activando...');
+  setTimeout(() => disconnect(), 600);
+});
+
+// Persistencia básica
+el('btnSave').addEventListener('click', ()=>{
+    localStorage.setItem('guante_cfg', JSON.stringify({
+        dFlex: el('cfgDeadFlex').value,
+        dWrist: el('cfgDeadWrist').value
+    }));
+    el('saveHint').textContent = 'Guardado OK';
+});
+try {
+    const cfg = JSON.parse(localStorage.getItem('guante_cfg'));
+    if(cfg) { el('cfgDeadFlex').value=cfg.dFlex; el('cfgDeadWrist').value=cfg.dWrist; }
+} catch(e){}
+
+if(!('bluetooth' in navigator)){ log('Navegador no soporta Web Bluetooth'); el('btnConnect').disabled=true; }
+
+setConnected(false);
+</script>
+</body>
+</html>
