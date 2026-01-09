@@ -118,36 +118,12 @@
   .val-big { font-size: 32px; font-weight: 800; color: var(--text-main); line-height: 1.1; }
   .unit { font-size: 14px; font-weight: 500; color: var(--text-light); margin-left: 2px; }
 
-  /* --- NUEVO: Estilos para Calibración Centrada --- */
-  .calib-display {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  .calib-value-big {
-    font-size: 56px; /* Muy grande */
-    font-weight: 800;
-    color: var(--btn-primary);
-    line-height: 1;
-    margin: 10px 0;
-  }
-  .calib-saved-box {
-    background: #F4F4F0;
-    border: 1px solid #E0D8CC;
-    border-radius: 12px;
-    padding: 12px 20px;
-    width: 100%;
-    margin-top: 10px;
-  }
-  .calib-saved-vals {
-    font-family: 'Courier New', monospace;
-    font-weight: 600;
-    color: var(--text-main);
-    font-size: 15px;
-  }
+  /* --- Calibración Centrada --- */
+  .calib-display { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; margin-bottom: 20px; }
+  .calib-value-big { font-size: 64px; font-weight: 800; color: var(--btn-primary); line-height: 1; margin: 10px 0; }
+  .calib-unit { font-size: 32px; color: var(--text-light); font-weight: 400; }
+  .calib-saved-box { background: #F4F4F0; border: 1px solid #E0D8CC; border-radius: 12px; padding: 12px 20px; width: 100%; margin-top: 10px; }
+  .calib-saved-vals { font-family: 'Courier New', monospace; font-weight: 600; color: var(--text-main); font-size: 15px; }
 
   /* --- Logs --- */
   .log { height: 100px; overflow: auto; background: #F8F8F8; padding: 10px; border-radius: 8px; font-size: 12px; color: #666; font-family: monospace; border: 1px solid #EEE; }
@@ -159,7 +135,7 @@
   .finish-card { border: 2px solid var(--btn-success); background: #F4FAF0; text-align: center; }
   #btnFinish { background: var(--btn-success); color: #FFF; font-size: 18px; padding: 16px; width: 100%; margin-top: 10px; box-shadow: 0 4px 10px rgba(127, 176, 105, 0.25); }
 
-  /* --- Desplegable de Ayuda --- */
+  /* --- Ayuda --- */
   .help-card { background: var(--help-bg); border: 1px solid var(--help-border); cursor: pointer; transition: all 0.2s; }
   .help-card:hover { transform: translateY(-2px); }
   .help-content { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); display: none; }
@@ -168,13 +144,7 @@
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
   .hidden { display: none !important; }
-  .mono { font-family: monospace; font-weight: 600; color: #555; }
   input[type="number"], select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #DDD; background: #FFF; color: var(--text-main); font-size: 15px; }
-
-  /* Radio Pills */
-  .pill { padding: 6px 14px; border-radius: 99px; border: 1px solid #DDD; background: #FFF; cursor: pointer; font-size: 13px; color: var(--text-light); }
-  .pill input { display: none; }
-  .pill:has(input:checked) { background: var(--btn-primary); color: #FFF; border-color: var(--btn-primary); }
 
 </style>
 </head>
@@ -216,9 +186,9 @@
           <div class="small" style="margin-top: 8px;">Porcentaje: <b><span id="valPctFlex">0</span>%</b></div>
         </div>
         <div>
-          <label>Ángulo Real</label>
-          <div class="val-big"><span id="valDegFlex">0.00</span><span class="unit">°</span></div>
-          <div class="small">Sensor I2C</div>
+          <label>Aceleración</label>
+          <div class="val-big"><span id="valPctFlexSmall">0</span><span class="unit">%</span></div>
+          <div class="small">Potencia enviada</div>
         </div>
       </div>
     </div>
@@ -257,62 +227,60 @@
       </div>
       <div class="help-content" id="helpContent">
         <ul class="help-list" style="padding-left:20px; margin:0;">
-          <li><b>🛑 IMPORTANTE:</b> Siempre se debe tomar un valor de calibración cuando la lectura sea <b>estable o tiene poca variación</b></li>
+          <li><b>ℹ️ El valor grande muestra el PORCENTAJE (0-100%).</b></li>
           <li style="margin-top:8px"><b>1. Mano (Velocidad):</b>
-            <br>✋ Abre la mano relajada ➡️ Pulsa "Mano Abierta". <b>Piensa que esta postura debe ser natural.</b>
-            <br>✊ Cierra el puño fuerte ➡️ Pulsa "Mano Cerrada".
+            <br>✋ Abre la mano relajada ➡️ Pulsa "Mano Abierta" (Debería marcar 0%).
+            <br>✊ Cierra el puño fuerte ➡️ Pulsa "Mano Cerrada" (Debería marcar 100%).
           </li>
           <li style="margin-top:8px"><b>2. Muñeca (Giro):</b>
-            <br>👇 Pon la mano en una posición <b>NATURAL</b>, piensa que sera la referencia para ir recto. ➡️ Pulsa "Guardar CENTRO".
-            <br>👈 Gira la mano lo<b> máximo a la izquierda</b> que puedas, esta posición será el máximo giro a la izquierda posible. ➡️ Pulsa "Max. IZQ".
-            <br>👉 Gira la mano lo<b> máximo a la derecha</b> que puedas, esta posición será el máximo giro a la derecha posible.  Pulsa "Max. IZQ".
+            <br>👇 Mano RECTA (Natural) ➡️ Pulsa "Guardar CENTRO".
+            <br>👈 Gira MAX Izquierda ➡️ Pulsa "Max. IZQ".
+            <br>👉 Gira MAX Derecha ➡️ Pulsa "Max. DER".
           </li>
           <li style="margin-top:8px"><b>3. Finalizar:</b>
-            <br>✅ Cuando acabes, pulsa el botón VERDE abajo del todo.
+            <br>✅ Pulsa el botón VERDE abajo del todo.
           </li>
         </ul>
       </div>
     </div>
 
     <div class="card">
-      <div class="title"> 🚀 Ajustar aceleración (Mano)</div>
+      <div class="title"> 🚀 Calibrar Aceleración (%)</div>
       
       <div class="calib-display">
-        <label>Lectura Actual</label>
-        <div class="calib-value-big"><span id="valDegFlex2">0.00</span>°</div>
+        <label>Potencia Actual</label>
+        
+        <div class="calib-value-big"><span id="valDegFlex2">0</span><span class="calib-unit">%</span></div>
+        <div class="small" style="color:var(--text-light); margin-bottom:10px;">0% = Parado | 100% = Máx Vel</div>
         
         <div class="calib-saved-box">
-          <label style="margin-bottom:4px;">Valores Guardados</label>
-          <div class="calib-saved-vals">🖐️ Abierta: <span id="minVal">—</span>° | ✊ Cerrada: <span id="maxVal">—</span>°</div>
+          <label style="margin-bottom:4px;">Refs. Guardadas (Raw ADC)</label>
+          <div class="calib-saved-vals">Abierta: <span id="minVal">—</span> | Cerrada: <span id="maxVal">—</span></div>
         </div>
       </div>
       
       <div class="calib-actions">
-        <button id="btnOpen" class="secondary">1) Mano Abierta</button>
-        <button id="btnClosed" class="secondary">2) Mano Cerrada</button>
-        <button id="btnReset" class="warn btn-full">Borrar calibración mano</button>
+        <button id="btnOpen" class="secondary">1) Asignar 0% (Abierta)</button>
+        <button id="btnClosed" class="secondary">2) Asignar 100% (Cerrada)</button>
+        <button id="btnReset" class="warn btn-full">Reiniciar Calibración</button>
       </div>
     </div>
 
     <div class="card">
-      <div class="title">🔄️ Ajustar el volante (Inclinación de la muñeca)</div>
+      <div class="title">🔄️ Ajustar Volante (Giro)</div>
       
       <div class="calib-display">
-        <label>Lectura Actual</label>
-        <div class="calib-value-big"><span id="valWrist2">0.00</span>°</div>
+        <label>Inclinación Actual</label>
+        <div class="calib-value-big"><span id="valWrist2">0.00</span><span class="calib-unit">°</span></div>
         
         <div class="calib-saved-box">
-          <label style="margin-bottom:4px;">Valores Guardados</label>
-          <div class="calib-saved-vals"> Izquierda: <span id="rotMin2">—</span>° <b>|</b> Centro: <span id="rotZero2">—</span>°<b> | </b>Derecha: <span id="rotMax2">—</span>°
-            
-           
-            
-          </div>
+          <label style="margin-bottom:4px;">Ángulos Guardados</label>
+          <div class="calib-saved-vals"> Izq: <span id="rotMin2">—</span>° <b>|</b> Centro: <span id="rotZero2">—</span>°<b> | </b>Der: <span id="rotMax2">—</span>°</div>
         </div>
       </div>
 
       <div class="calib-actions">
-        <button id="btnRotReset" class="warn btn-full">1º Reiniciar (Borrar Todo)</button>
+        <button id="btnRotReset" class="warn btn-full">1º Reiniciar</button>
         <button id="btnRotZero" class="secondary btn-full">2º Guardar CENTRO (Neutro)</button>
         <button id="btnRotCCW" class="secondary">3º Max. IZQ</button>
         <button id="btnRotCW" class="secondary">4º Max. DER</button>
@@ -321,12 +289,12 @@
 
     <div class="card finish-card">
       <div class="title" style="justify-content:center; color: var(--btn-success);">🚀 Paso Final</div>
-      <p>Una vez calibrado todo, pulsa este botón. <br>La web se desconectará y la silla se activará.</p>
+      <p>Cuando el porcentaje funcione bien (0% abierta, 100% cerrada),<br>pulsa aquí para empezar.</p>
       <button id="btnFinish">✅ TERMINAR Y CONDUCIR</button>
     </div>
 
     <div class="card">
-      <div class="title">Ajustes Avanzados <button id="openWizardFlex" class="ghost">Asistente</button></div>
+      <div class="title">Ajustes Avanzados</div>
       <div class="grid">
         <div>
           <label>Zona Muerta Aceleración (%)</label>
@@ -339,15 +307,9 @@
       </div>
       <div class="calib-actions" style="margin-top:15px">
         <button id="btnSave" class="secondary">Guardar en Memoria</button>
-        <button id="btnDefaults" class="warn">Restaurar Fábrica</button>
       </div>
       <div class="small" id="saveHint" style="text-align:center; margin-top:10px;">—</div>
     </div>
-
-    <section id="wizardFlexCard" style="display:none; background:#F7F7F7; padding:15px; border-radius:10px; margin-top:10px;">
-        <p>Aquí irían las preguntas del asistente...</p>
-        <button id="wizFlexCancel" class="secondary">Cerrar</button>
-    </section>
 
   </section>
 </main>
@@ -378,10 +340,6 @@ el('toggleHelp').addEventListener('click', () => {
   }
 });
 
-// Asistentes
-el('openWizardFlex').addEventListener('click', ()=> { el('wizardFlexCard').style.display='block'; });
-el('wizFlexCancel').addEventListener('click', ()=> { el('wizardFlexCard').style.display='none'; });
-
 // UUIDs
 const SVC_UUID   = '6e400001-b5a3-f393-e0a9-e50e24dcca9f';
 const RAW_UUID   = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
@@ -392,7 +350,6 @@ const CAL_UUID   = '6e400006-b5a3-f393-e0a9-e50e24dcca9e';
 const ROT_UUID   = '6e400007-b5a3-f393-e0a9-e50e24dcca9e';
 const ROTN_UUID  = '6e400008-b5a3-f393-e0a9-e50e24dcca9e';
 const RCAL_UUID  = '6e400009-b5a3-f393-e0a9-e50e24dcca9e';
-const CTRL_UUID  = '6e40000a-b5a3-f393-e0a9-e50e24dcca9e';
 
 // Estado
 let device, server, service;
@@ -401,13 +358,11 @@ let chRot, chRotN, chRcal;
 
 const setConnected = (on, name='—')=>{
   el('dot').classList.toggle('on', on);
-  
   const statusText = el('statusText');
   if(statusText) {
     statusText.textContent = on ? 'Conectado' : 'Desconectado';
     statusText.style.color = on ? 'var(--btn-success)' : 'var(--text-light)';
   }
-
   el('btnConnect').disabled = on; el('btnConnect').textContent = on ? 'Conectado' : 'Conectar';
   el('btnDisconnect').disabled = !on;
   const btns = ['btnOpen','btnClosed','btnReset','btnRotZero','btnRotCCW','btnRotCW','btnRotReset','btnFinish'];
@@ -424,7 +379,6 @@ async function connect(){
     server = await device.gatt.connect();
     service = await server.getPrimaryService(SVC_UUID);
 
-    chRaw  = await service.getCharacteristic(RAW_UUID);
     chNorm = await service.getCharacteristic(NORM_UUID);
     chAng  = await service.getCharacteristic(ANG_UUID);
     chCmd  = await service.getCharacteristic(CMD_UUID);
@@ -432,34 +386,43 @@ async function connect(){
     chRot  = await service.getCharacteristic(ROT_UUID);
     chRotN = await service.getCharacteristic(ROTN_UUID);
     chRcal = await service.getCharacteristic(RCAL_UUID);
-    try { chRaw = await service.getCharacteristic(RAW_UUID); } catch(e){}
 
-    // Suscripciones
+    // --- SUSCRIPCIONES ---
+    
+    // 1. CARACTERÍSTICA PORCENTAJE (Norm)
+    // Usamos esto para el número grande en Calibración y para la barra
     await chNorm.startNotifications();
     chNorm.addEventListener('characteristicvaluechanged', e=>{
       const pct = e.target.value.getUint8(0);
+      
+      // Actualizar Tab Lecturas
       el('valPctFlex').textContent = pct;
+      el('valPctFlexSmall').textContent = pct;
       el('barFlex').style.width = `${clamp(pct,0,100)}%`;
+      
+      // Actualizar Tab Calibración (AQUÍ ESTÁ EL CAMBIO)
+      // Ahora el display grande muestra el porcentaje, no el valor crudo
+      el('valDegFlex2').textContent = pct;
     });
     
+    // 2. CARACTERÍSTICA RAW (Ang)
+    // Ya no la mostramos en grande, pero la leemos por si acaso
     await chAng.startNotifications();
-    chAng.addEventListener('characteristicvaluechanged', e=>{
-      const v = e.target.value.getFloat32(0, true);
-      el('valDegFlex').textContent = v.toFixed(2);
-      el('valDegFlex2').textContent = v.toFixed(2);
-    });
-
+    // (Opcional) Si quisieras mostrar el raw pequeñito en algún lado para debug, podrías hacerlo aquí.
+    
+    // 3. DATOS DE CALIBRACIÓN GUARDADOS
     await chCal.startNotifications();
     chCal.addEventListener('characteristicvaluechanged', e => {
       const min = e.target.value.getFloat32(0, true);
       const max = e.target.value.getFloat32(4, true);
-      el('minVal').textContent = min.toFixed(1);
-      el('maxVal').textContent = max.toFixed(1);
+      el('minVal').textContent = min.toFixed(0); // Estos sí los dejamos en Raw para referencia
+      el('maxVal').textContent = max.toFixed(0);
     });
     const dvCal = await chCal.readValue();
-    el('minVal').textContent = dvCal.getFloat32(0, true).toFixed(1);
-    el('maxVal').textContent = dvCal.getFloat32(4, true).toFixed(1);
+    el('minVal').textContent = dvCal.getFloat32(0, true).toFixed(0);
+    el('maxVal').textContent = dvCal.getFloat32(4, true).toFixed(0);
 
+    // 4. GIROSCOPIO
     await chRot.startNotifications();
     chRot.addEventListener('characteristicvaluechanged', e=>{
       const deg = e.target.value.getFloat32(0, true);
